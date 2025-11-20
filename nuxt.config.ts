@@ -2,9 +2,12 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss"],
+  modules: ["@nuxtjs/tailwindcss", "@nuxt/icon"],
   runtimeConfig: {
-    backendURL: "http://localhost:8000",
+    backendURL: import.meta.env.BACKEND_URL,
   },
   ssr: false,
+  icon: {
+    collections: ["uil", "mdi"],
+  },
 });

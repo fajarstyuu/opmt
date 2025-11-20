@@ -1,124 +1,105 @@
 <template>
-  <div class="flex items-center justify-between mb-6">
-    <div class="flex gap-2">
-      <button
-        @click="zoomIn"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
-      >
-        Zoom In
-      </button>
-      <button
-        @click="zoomOut"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
-      >
-        Zoom Out
-      </button>
-      <button
-        @click="resetZoom"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
-      >
-        Reset
-      </button>
-    </div>
-  </div>
+  <div
+    class="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-6"
+  >
+    <div class="flex gap-6 h-[calc(100vh-3rem)]">
+      <!-- Sidebar -->
+      <DiscoverySidebar>
+        <template #actions>
+          <button
+            class="w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon
+                points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+              ></polygon>
+            </svg>
+            Pilih Kriteria
+          </button>
+        </template>
 
-  <!-- Petrinet -->
-  <div class="flex flex-row h-full space-x-4">
-    <div
-      class="w-64 h-full bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg p-6"
-    >
-      <!-- Section Informasi -->
-      <div>
-        <h2 class="text-xl font-bold text-gray-800">Information</h2>
+        <template #stats>
+          <div class="bg-white/50 rounded-lg p-3">
+            <p class="text-xs text-gray-600 mb-1">Filter Aktif</p>
+            <p class="text-sm font-medium text-gray-800">Belum ada filter</p>
+          </div>
 
-        <div class="mt-2 space-y-2">
-          <slot name="stats">
-            <information-label placeholder="Jumlah Case" :content="totalCase" />
-            <information-label
-              placeholder="Jumlah Variants"
-              :content="totalVariants"
-            />
-          </slot>
+          <div class="bg-white/50 rounded-lg p-3">
+            <p class="text-xs text-gray-600 mb-1">Total Events</p>
+            <p class="text-2xl font-bold text-indigo-600">1,247</p>
+          </div>
+
+          <div class="bg-white/50 rounded-lg p-3">
+            <p class="text-xs text-gray-600 mb-1">Cases</p>
+            <p class="text-2xl font-bold text-purple-600">156</p>
+          </div>
+        </template>
+      </DiscoverySidebar>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col">
+        <!-- Process Model Visualization -->
+        <div
+          class="flex-1 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-6 border-2 border-white/50 overflow-hidden flex flex-col"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">Petri Net Model</h3>
+            <div class="flex gap-2">
+              <button
+                @click="zoomIn"
+                class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+              >
+                Zoom In
+              </button>
+              <button
+                @click="zoomOut"
+                class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+              >
+                Zoom Out
+              </button>
+              <button
+                @click="resetZoom"
+                class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Petri Net Stands Here Coming Soon -->
+          <div
+            ref="cyContainer"
+            class="w-full flex-1 min-h-[300px] overflow-auto"
+          ></div>
         </div>
-      </div>
 
-      <!-- Section Conformance -->
-      <div class="mt-6">
-        <h2 class="text-xl font-bold text-gray-800">Conformance Metrics</h2>
-        <div class="mt-2 space-y-3">
-          <information-label placeholder="Fitness" :content="fitness" />
-          <information-label placeholder="Precision" :content="precision" />
-          <information-label
-            placeholder="Generalization"
-            :content="generalization"
-          />
-          <information-label placeholder="Simplicity" :content="simplicity" />
-        </div>
+        <!-- Bottom Tabs -->
+        <BottomTabs v-model="selectedTab" />
       </div>
     </div>
-    <div
-      ref="cyContainer"
-      class="w-full flex-1 min-h-[300px] overflow-auto"
-    ></div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
+import DiscoverySidebar from "~/components/DiscoverySidebar.vue";
+import BottomTabs from "~/components/BottomTabs.vue";
 import cytoscape from "cytoscape";
 
-const { data: datas } = useFile();
+// Use a minimal/plain layout for this page (so default layout is NOT applied)
+definePageMeta({ layout: "plain" });
 
-// Use the default application layout for this page
-// definePageMeta({ layout: "default" });
-
-const fitness = computed(() => {
-  if (datas?.value?.conformance_metrics) {
-    return (
-      (datas.value.conformance_metrics.fitness?.average_trace_fitness).toFixed(
-        3
-      ) || 0
-    );
-  }
-  return 0;
-});
-
-const precision = computed(() => {
-  if (datas?.value?.conformance_metrics) {
-    return datas.value.conformance_metrics.precision.toFixed(3) || 0;
-  }
-  return 0;
-});
-
-const generalization = computed(() => {
-  if (datas?.value?.conformance_metrics) {
-    return datas.value.conformance_metrics.generalization.toFixed(3) || 0;
-  }
-  return 0;
-});
-
-const simplicity = computed(() => {
-  if (datas?.value?.conformance_metrics) {
-    return datas.value.conformance_metrics.simplicity.toFixed(3) || 0;
-  }
-  return 0;
-});
-
-const totalCase = computed(() => {
-  if (datas?.value?.model_statistics) {
-    return datas.value.model_statistics.number_of_cases || 0;
-  }
-  return 0;
-});
-
-const totalVariants = computed(() => {
-  if (datas?.value?.model_statistics) {
-    return datas.value.model_statistics.number_of_variants || 0;
-  }
-  return 0;
-});
-
-const zoomLevel = ref(1);
+const selectedTab = ref("discovery");
+const zoomLevel = ref(1); // Keeping this line for reference, but it will be replaced by direct control of cyInstance
 
 function zoomIn() {
   if (cyInstance && cyInstance.zoom) {
@@ -231,7 +212,6 @@ function createCytoscape(elements) {
         style: {
           width: 2,
           "line-color": "#9CA3AF",
-          // label: "data(frequency)",
           "target-arrow-color": "#9CA3AF",
           "target-arrow-shape": "triangle",
           "curve-style": "bezier",

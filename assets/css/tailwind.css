@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* IE and Edge */
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+  }
+
+  /* Firefox */
+  .scrollbar-hidden {
+    scrollbar-width: none;
+  }
+}
+
+.dropdown-menu {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+}
+
+.show .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,6 +1,7 @@
 <template>
   <div class="flex gap-4">
-    <button
+    <NuxtLink
+      to="/discovery"
       @click="select('discovery')"
       :class="[
         'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
@@ -27,9 +28,10 @@
         </slot>
         <slot name="discovery-label">Discovery</slot>
       </div>
-    </button>
+    </NuxtLink>
 
-    <button
+    <NuxtLink
+      to="/statistic"
       @click="select('statistics')"
       :class="[
         'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
@@ -57,7 +59,7 @@
         </slot>
         <slot name="statistics-label">Statistics</slot>
       </div>
-    </button>
+    </NuxtLink>
   </div>
 </template>
 

@@ -369,6 +369,9 @@
 <script setup>
 import { ref } from "vue";
 
+// Use a minimal/plain layout for this page (so default layout is NOT applied)
+definePageMeta({ layout: "plain" });
+
 const selectedTab = ref("discovery");
 const zoomLevel = ref(1);
 

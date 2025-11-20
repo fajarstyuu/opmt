@@ -15,15 +15,6 @@
             Analisis log proses Anda secara mudah dan cepat — unggah dataset CSV
             atau XES.
           </p>
-          <NuxtLink
-            to="/discovery"
-            class="inline-block mt-2 text-indigo-600 font-medium hover:underline"
-          >
-            <p class="text-gray-700 text-sm md:text-base">
-              Analisis log proses Anda secara mudah dan cepat — unggah dataset
-              CSV atau XES.
-            </p>
-          </NuxtLink>
         </div>
 
         <div class="flex-shrink-0">
@@ -42,7 +33,7 @@
             <input
               ref="inputRef"
               type="file"
-              accept=".csv,.xes"
+              accept=".csv,.xes,.xes.gz"
               class="hidden"
               @change="handleFiles($event.target.files)"
             />
@@ -164,6 +155,10 @@
 <script setup>
 import { ref } from "vue";
 
+// Use a minimal/plain layout for the index page
+definePageMeta({ layout: "plain" });
+import { useFile } from "~/composables/useFile";
+
 const emit = defineEmits(["upload"]);
 
 const dragOver = ref(false);
@@ -172,6 +167,14 @@ const fileInfo = ref(null);
 const error = ref("");
 const uploading = ref(false);
 
+const {
+  upload,
+  data,
+  pending: uploadPending,
+  error: uploadError,
+  fileInfo: uploadFileInfo,
+} = useFile();
+
 function openFilePicker() {
   inputRef.value?.click();
 }
@@ -179,7 +182,7 @@ function openFilePicker() {
 function isAccepted(filename) {
   if (!filename) return false;
   const lower = filename.toLowerCase();
-  return [".csv", ".xes"].some((ext) => lower.endsWith(ext));
+  return [".csv", ".xes", ".xes.gz"].some((ext) => lower.endsWith(ext));
 }
 
 function handleFiles(files) {
@@ -211,17 +214,18 @@ function uploadFile() {
     error.value = "Belum ada file untuk di-upload.";
     return;
   }
-
   uploading.value = true;
+  error.value = "";
 
-  emit("upload", fileInfo.value.file);
-
-  setTimeout(() => {
-    uploading.value = false;
-    alert(`File "${fileInfo.value.name}" berhasil diupload!`);
-    fileInfo.value = null;
-    if (inputRef.value) inputRef.value.value = null;
-  }, 1500);
+  upload(fileInfo.value.file)
+    .then((res) => {
+      emit("upload", fileInfo.value.file);
+      navigateTo("/discovery");
+    })
+    .catch((err) => {
+      console.error("upload error:", err);
+      error.value = (err && err.message) || "Upload gagal.";
+    });
 }
 
 function onDrop(e) {
