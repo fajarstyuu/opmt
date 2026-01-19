@@ -19,20 +19,20 @@
       >
         Reset
       </button>
-      <button
-        @click="handleDownload"
-        :disabled="isDownloading"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isDownloading ? "Downloading..." : "Download" }}
-      </button>
-      <button
-        @click="handleDownloadEventLog"
-        :disabled="isDownloadingEventLog"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isDownloadingEventLog ? "Downloading..." : "Download Event Log" }}
-      </button>
+    </div>
+    <div class="flex flex-row gap-4">
+      <template v-if="selectedModelType === 'dfg'">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">Model:</span>
+          <select
+            v-model="selectedModelTypeDisplay"
+            class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="dur">Duration</option>
+            <option value="freq">Frequency</option>
+          </select>
+        </div>
+      </template>
       <div class="flex items-center gap-2">
         <span class="text-sm text-gray-600">Model:</span>
         <select
@@ -43,67 +43,6 @@
           <option value="dfg">DFG</option>
         </select>
       </div>
-      <template v-if="selectedModelType === 'dfg'">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">Type:</span>
-          <select
-            v-model="selectedModelTypeDisplay"
-            class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="dur">Duration</option>
-            <option value="freq">Frequency</option>
-          </select>
-        </div>
-      </template>
-    </div>
-    <div class="flex flex-wrap items-center gap-4">
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-600">Algorithm:</span>
-        <select
-          v-model="selectedAlgorithmValue"
-          class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option
-            v-for="option in algorithmOptions"
-            :key="option.value"
-            :value="option.value"
-          >
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="bg-white px-4 py-2 rounded-xl border-2 flex flex-col gap-1 min-w-[220px] text-xs"
-      >
-        <div class="flex items-center justify-between text-xs text-gray-600">
-          <span>Noise Threshold</span>
-          <span class="font-semibold text-gray-900">
-            {{ formattedNoiseThreshold }}
-          </span>
-        </div>
-        <input
-          type="range"
-          class="w-full accent-indigo-600"
-          min="0"
-          max="1"
-          step="0.01"
-          v-model.number="noiseThresholdValue"
-        />
-      </div>
-      <button
-        @click="handleDiscover"
-        :disabled="isDiscovering"
-        class="px-3 py-1.5 text-xs font-medium bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isDiscovering ? "Discovering..." : "Discover!" }}
-      </button>
-      <button
-        @click="handleEvaluate"
-        :disabled="isEvaluating"
-        class="px-3 py-1.5 text-xs font-medium bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isEvaluating ? "Evaluating..." : "Evaluate" }}
-      </button>
     </div>
   </div>
 
@@ -114,77 +53,20 @@
       class="w-full flex-1 min-h-[300px] overflow-auto"
     ></div>
   </div>
-  <!-- Conformance Metrics -->
-  <div class="mt-6">
-    <h2 class="text-base font-semibold text-gray-800 mb-3">
-      Evaluation Metrics
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-      <div
-        v-for="metric in conformanceMetrics"
-        :key="metric.label"
-        class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
-      >
-        <p class="text-gray-500 text-xs uppercase tracking-wide">
-          {{ metric.label }}
-        </p>
-        <p class="text-lg font-semibold text-gray-900">
-          {{ metric.value }}
-        </p>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import cytoscape from "cytoscape";
 
-import { useFilters } from "~/composables/useFilters";
-import { useFilterSelection } from "~/composables/useModel";
-
-const { data, downloadModel } = useFile();
-const { selectedAlgorithm, noiseThreshold } = useFilters();
-const { selection: filterSelection } = useFilterSelection();
-
-const algorithmOptions = [
-  { label: "Inductive Miner", value: "inductive" },
-  { label: "Heuristic Miner", value: "heuristic" },
-  { label: "Alpha Miner", value: "alpha" },
-];
-
-const selectedAlgorithmValue = selectedAlgorithm;
-const noiseThresholdValue = noiseThreshold;
-watch(selectedAlgorithmValue, (newVal) => {
-  console.log("Selected Algorithm changed to:", newVal);
-});
-
-const formattedNoiseThreshold = computed(() => {
-  const value =
-    typeof noiseThresholdValue.value === "number"
-      ? noiseThresholdValue.value
-      : 0;
-  return value.toFixed(2);
-});
-
-const conformanceMetrics = computed(() => {
-  const metrics = data.value?.petri_net?.conformance_metrics;
-  const format = (val) =>
-    typeof val === "number" && Number.isFinite(val) ? val.toFixed(3) : "N/A";
-
-  return [
-    {
-      label: "Fitness",
-      value: format(metrics?.fitness?.average_trace_fitness),
-    },
-    { label: "Precision", value: format(metrics?.precision) },
-    { label: "Generalization", value: format(metrics?.generalization) },
-    { label: "Simplicity", value: format(metrics?.simplicity) },
-  ];
-});
+const { data: datas } = useFile();
 
 const selectedModelType = ref("petrinet");
 const selectedModelTypeDisplay = ref("dur");
+
+function removeMilliseconds(str) {
+  return str.includes(".") ? str.split(".")[0] : str;
+}
 
 const zoomLevel = ref(1);
 
@@ -221,17 +103,7 @@ function resetZoom() {
 }
 
 const cyContainer = ref(null);
-const isDownloading = ref(false);
-const isDownloadingEventLog = ref(false);
-const isDiscovering = ref(false);
-const isEvaluating = ref(false);
-const sessionCookie = useCookie("session_id");
-const initialSessionId = sessionCookie.value || "";
-const discoveryModel = ref(null);
-
-function getActiveSessionId() {
-  return sessionCookie.value || initialSessionId;
-}
+const { data } = useFile();
 
 let cyInstance = null;
 
@@ -591,249 +463,6 @@ watch(
 onMounted(() => {
   rebuildGraph();
 });
-
-async function handleDownload() {
-  if (isDownloading.value) return;
-  isDownloading.value = true;
-  try {
-    await downloadModel({
-      session_id: getActiveSessionId(),
-      algorithm: selectedAlgorithmValue.value || "inductive",
-      noiseThreshold: clampNoise(noiseThresholdValue.value),
-      variantsCoverage: fallbackPercentage(
-        filterSelection.value.variantsCoverage
-      ),
-      eventCoverage: fallbackPercentage(filterSelection.value.eventCoverage),
-      caseDurationMin: sanitizeNumber(filterSelection.value.caseDurationMin),
-      caseDurationMax: sanitizeNumber(filterSelection.value.caseDurationMax),
-      numberOfEventsMin: sanitizeNumber(filterSelection.value.minCaseSize),
-      numberOfEventsMax: sanitizeNumber(filterSelection.value.maxCaseSize),
-    });
-  } catch (error) {
-    console.error("Failed to download model", error);
-  } finally {
-    isDownloading.value = false;
-  }
-}
-
-async function handleDownloadEventLog() {
-  if (isDownloadingEventLog.value) return;
-  const activeSessionId = getActiveSessionId();
-  if (!activeSessionId) {
-    console.warn("Session ID is required before downloading event log.");
-    return;
-  }
-
-  isDownloadingEventLog.value = true;
-  try {
-    const response = await $fetch.raw("/api/download-event-log", {
-      method: "POST",
-      body: {
-        session_id: activeSessionId,
-      },
-      responseType: "arrayBuffer",
-    });
-
-    const arrayBuffer = response._data || new ArrayBuffer(0);
-    const contentType =
-      response.headers.get("content-type") || "application/octet-stream";
-    const blob = new Blob([arrayBuffer], { type: contentType });
-
-    const disposition = response.headers.get("content-disposition");
-    const filename =
-      disposition?.match(/filename="?([^";]+)"?/)?.[1] ||
-      `event_log_${Date.now()}.xes`;
-
-    triggerBrowserDownload(blob, filename);
-  } catch (error) {
-    console.error("Failed to download event log", error);
-  } finally {
-    isDownloadingEventLog.value = false;
-  }
-}
-
-const handleDiscover = async () => {
-  if (isDiscovering.value) return;
-
-  const algorithm = selectedAlgorithmValue.value || "inductive";
-  const thresholdRaw =
-    typeof noiseThresholdValue.value === "number"
-      ? noiseThresholdValue.value
-      : 0;
-  const noiseThreshold = Math.min(1, Math.max(0, thresholdRaw));
-
-  const activeSessionId = getActiveSessionId();
-  if (!activeSessionId) {
-    console.warn("Session ID is required before discovering.");
-    return;
-  }
-
-  isDiscovering.value = true;
-  try {
-    console.log("Discovering...", {
-      sessionId: activeSessionId,
-      algorithm,
-      noiseThreshold,
-    });
-    const response = await discoverModel(
-      activeSessionId,
-      algorithm,
-      noiseThreshold
-    );
-    console.log("Discovery complete.", response);
-
-    const payload = response?.data;
-    if (!payload) {
-      console.warn("Discovery did not return any data payload");
-      return;
-    }
-
-    discoveryModel.value = payload.petri_net || null;
-    data.value = payload;
-    selectedModelType.value = "petrinet";
-    rebuildGraph();
-  } catch (error) {
-    console.error("Failed to discover", error);
-  } finally {
-    isDiscovering.value = false;
-  }
-};
-
-const handleEvaluate = async () => {
-  if (isEvaluating.value) return;
-
-  const activeSessionId = getActiveSessionId();
-  if (!activeSessionId) {
-    console.warn("Session ID is required before evaluating.");
-    return;
-  }
-
-  const algorithm = selectedAlgorithmValue.value || "inductive";
-  const thresholdRaw =
-    typeof noiseThresholdValue.value === "number"
-      ? noiseThresholdValue.value
-      : 0;
-  const noiseThreshold = clampNoise(thresholdRaw);
-  const variantsCoverageRatio = percentageToRatio(
-    filterSelection.value.variantsCoverage,
-    1
-  );
-  const eventsCoverageRatio = percentageToRatio(
-    filterSelection.value.eventCoverage,
-    1
-  );
-
-  isEvaluating.value = true;
-  console.log("Evaluating conformance...", {
-    sessionId: activeSessionId,
-    algorithm,
-    noiseThreshold,
-    variantsCoverageRatio,
-    eventsCoverageRatio,
-    caseDurationMin: filterSelection.value.caseDurationMin,
-    caseDurationMax: filterSelection.value.caseDurationMax,
-    numberOfEventsMin: filterSelection.value.minCaseSize,
-    numberOfEventsMax: filterSelection.value.maxCaseSize,
-  });
-  try {
-    const response = await $fetch("/api/conformance", {
-      method: "POST",
-      body: {
-        session_id: activeSessionId,
-        model: algorithm,
-        noise_threshold: noiseThreshold,
-        variants_coverage: variantsCoverageRatio,
-        events_coverage: eventsCoverageRatio,
-        min_case_duration: sanitizeNumber(
-          filterSelection.value.caseDurationMin
-        ),
-        max_case_duration: sanitizeNumber(
-          filterSelection.value.caseDurationMax
-        ),
-        min_case_size: sanitizeNumber(filterSelection.value.minCaseSize),
-        max_case_size: sanitizeNumber(filterSelection.value.maxCaseSize),
-      },
-    });
-
-    const metrics = response?.data;
-    if (!metrics) {
-      console.warn("Conformance evaluation did not return metrics data");
-      return;
-    }
-
-    const current = data.value || {};
-    data.value = {
-      ...current,
-      petri_net: {
-        ...(current?.petri_net || {}),
-        conformance_metrics: metrics,
-      },
-    };
-  } catch (error) {
-    console.error("Failed to evaluate conformance", error);
-  } finally {
-    isEvaluating.value = false;
-  }
-};
-
-const discoverModel = async (sessionId, modelName, noiseThreshold) => {
-  const payload = {
-    session_id: sessionId,
-    model_name: modelName,
-    noise_threshold: noiseThreshold,
-  };
-  try {
-    const res = await $fetch("/api/discover", {
-      method: "POST",
-      body: payload,
-    });
-    console.log("Discovery response:", res);
-    return res;
-  } catch (error) {
-    console.error("Failed to discover", error);
-    throw error;
-  }
-};
-
-function fallbackPercentage(value) {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-  return 100;
-}
-
-function sanitizeNumber(value) {
-  if (typeof value !== "number") return undefined;
-  if (!Number.isFinite(value)) return undefined;
-  return value;
-}
-
-function percentageToRatio(value, fallback = 1) {
-  if (typeof value !== "number" || Number.isNaN(value)) return fallback;
-  const ratio = value / 100;
-  if (ratio < 0) return 0;
-  if (ratio > 1) return 1;
-  return ratio;
-}
-
-function clampNoise(value) {
-  if (typeof value !== "number" || Number.isNaN(value)) return 0;
-  if (value < 0) return 0;
-  if (value > 1) return 1;
-  return value;
-}
-
-function triggerBrowserDownload(blob, filename) {
-  if (!process.client) return;
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  document.body.removeChild(anchor);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 </script>
 
 <style scoped>

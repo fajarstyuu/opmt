@@ -1,6 +1,37 @@
 <template>
   <div class="flex gap-4">
     <NuxtLink
+      to="/statistic"
+      @click="select('statistics')"
+      :class="[
+        'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
+        selected === 'statistics'
+          ? 'bg-blue-400 text-white'
+          : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-white',
+      ]"
+    >
+      <div class="flex items-center justify-center gap-2">
+        <slot name="statistics-icon">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        </slot>
+        <slot name="statistics-label">Statistics</slot>
+      </div>
+    </NuxtLink>
+
+    <NuxtLink
       to="/discovery"
       @click="select('discovery')"
       :class="[
@@ -31,11 +62,11 @@
     </NuxtLink>
 
     <NuxtLink
-      to="/statistic"
-      @click="select('statistics')"
+      to="/filter?t=variants%coverage"
+      @click="select('filter')"
       :class="[
         'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
-        selected === 'statistics'
+        selected === 'filter'
           ? 'bg-blue-400 text-white'
           : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-white',
       ]"
@@ -52,12 +83,10 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
+            <polygon points="22 3 2 3 10 14 10 21 14 21 14 14 22 3"></polygon>
           </svg>
         </slot>
-        <slot name="statistics-label">Statistics</slot>
+        <slot name="statistics-label">Filter</slot>
       </div>
     </NuxtLink>
   </div>
@@ -65,7 +94,7 @@
 
 <script setup lang="ts">
 const props = defineProps({
-  modelValue: { type: String, default: "discovery" },
+  modelValue: { type: String, default: "statistics" },
 });
 const emit = defineEmits(["update:modelValue"]);
 

@@ -220,7 +220,7 @@ function uploadFile() {
   upload(fileInfo.value.file)
     .then((res) => {
       emit("upload", fileInfo.value.file);
-      navigateTo("/discovery");
+      navigateTo("/statistic");
     })
     .catch((err) => {
       console.error("upload error:", err);

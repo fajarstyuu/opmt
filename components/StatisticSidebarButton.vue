@@ -9,7 +9,7 @@
     ]"
   >
     <Icon :name="props.icon" style="color: black" size="1.25rem" />
-    <p class="text-xl font-medium text-black">{{ props.placeholder }}</p>
+    <p class="text-sm font-medium text-black">{{ props.placeholder }}</p>
   </button>
 </template>
 

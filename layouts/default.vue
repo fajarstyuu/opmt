@@ -7,7 +7,7 @@
 
       <main class="flex-1 flex flex-col">
         <div
-          class="flex-1 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-6 border-2 border-white/50 overflow-hidden flex flex-col"
+          class="flex-1 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg p-8 pb-16 mb-6 border-2 border-white/50 overflow-hidden flex flex-col"
         >
           <slot />
         </div>
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-const selectedTab = ref("discovery");
+const selectedTab = ref("statistics");
 watch(selectedTab, (newVal) => {
   console.log("Selected Tab:", newVal);
 });
