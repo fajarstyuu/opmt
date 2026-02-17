@@ -158,6 +158,7 @@ import { ref } from "vue";
 // Use a minimal/plain layout for the index page
 definePageMeta({ layout: "plain" });
 import { useFile } from "~/composables/useFile";
+import { useToast } from "~/composables/useToast";
 
 const emit = defineEmits(["upload"]);
 
@@ -166,6 +167,8 @@ const inputRef = ref(null);
 const fileInfo = ref(null);
 const error = ref("");
 const uploading = ref(false);
+
+const toast = useToast();
 
 const {
   upload,
@@ -192,6 +195,7 @@ function handleFiles(files) {
 
   if (!isAccepted(file.name)) {
     error.value = "Hanya file .csv atau .xes yang diperbolehkan.";
+    toast.error("Format file tidak didukung. Gunakan .csv, .xes, atau .xes.gz");
     return;
   }
 
@@ -219,12 +223,14 @@ function uploadFile() {
 
   upload(fileInfo.value.file)
     .then((res) => {
+      toast.success("File berhasil diunggah!");
       emit("upload", fileInfo.value.file);
       navigateTo("/statistic");
     })
     .catch((err) => {
       console.error("upload error:", err);
       error.value = (err && err.message) || "Upload gagal.";
+      toast.error("Gagal memproses. Harap coba lagi");
     });
 }
 

@@ -17,11 +17,11 @@
             :content="totalEvents"
           />
           <information-label
-            placeholder="Median Duration (s)"
+            placeholder="Median Duration (Hari)"
             :content="totalMedianDuration"
           />
           <information-label
-            placeholder="Mean Duration (s)"
+            placeholder="Mean Duration (Hari)"
             :content="totalMeanDuration"
           />
           <information-label placeholder="Start Time" :content="startTime" />
@@ -56,6 +56,7 @@
 import { computed } from "vue";
 import { useFile } from "~/composables/useFile";
 import { useStatistic } from "~/composables/useStatistic";
+import { secondToDayString } from "~/utils/format";
 
 const { data: datas } = useFile();
 const { generalStatistics } = useStatistic();
@@ -127,7 +128,7 @@ const totalCase = computed(() => {
   if (generalValue !== null) return generalValue;
   return fallbackModelStat(
     (stats) => stats.number_of_cases,
-    (val) => val || 0
+    (val) => val || 0,
   );
 });
 
@@ -136,7 +137,7 @@ const totalVariants = computed(() => {
   if (generalValue !== null) return generalValue;
   return fallbackModelStat(
     (stats) => stats.number_of_variants,
-    (val) => val || 0
+    (val) => val || 0,
   );
 });
 
@@ -145,29 +146,35 @@ const totalEvents = computed(() => {
   if (generalValue !== null) return generalValue;
   return fallbackModelStat(
     (stats) => stats.number_of_events,
-    (val) => val || 0
+    (val) => val || 0,
   );
 });
 
+const formatDurationToDays = (seconds) => {
+  if (typeof seconds !== "number" || Number.isNaN(seconds))
+    return "0hari 0jam 0menit";
+  return secondToDayString(Math.max(0, seconds));
+};
+
 const totalMedianDuration = computed(() => {
   const generalValue = preferGeneralNumber(
-    (data) => data.median_case_duration_seconds
+    (data) => data.median_case_duration_seconds,
   );
-  if (generalValue !== null) return `${generalValue} Detik`;
+  if (generalValue !== null) return formatDurationToDays(generalValue);
   return fallbackModelStat(
     (stats) => stats.median_case_duration_seconds,
-    (val) => `${val || 0} Detik`
+    (val) => formatDurationToDays(val || 0),
   );
 });
 
 const totalMeanDuration = computed(() => {
   const generalValue = preferGeneralNumber(
-    (data) => data.mean_case_duration_seconds
+    (data) => data.mean_case_duration_seconds,
   );
-  if (generalValue !== null) return `${generalValue} Detik`;
+  if (generalValue !== null) return formatDurationToDays(generalValue);
   return fallbackModelStat(
     (stats) => stats.mean_case_duration_seconds,
-    (val) => `${val || 0} Detik`
+    (val) => formatDurationToDays(val || 0),
   );
 });
 
@@ -177,7 +184,7 @@ const startTime = computed(() => {
   }
   return fallbackModelStat(
     (stats) => stats.start_time,
-    (val) => removeMilliseconds(val) || "N/A"
+    (val) => removeMilliseconds(val) || "N/A",
   );
 });
 
@@ -187,7 +194,7 @@ const endTime = computed(() => {
   }
   return fallbackModelStat(
     (stats) => stats.end_time,
-    (val) => removeMilliseconds(val) || "N/A"
+    (val) => removeMilliseconds(val) || "N/A",
   );
 });
 
@@ -198,7 +205,7 @@ const numberOfPlaces = computed(() => {
 
 const numberOfTransitions = computed(() => {
   const generalValue = preferGeneralNumber(
-    (data) => data.number_of_transitions
+    (data) => data.number_of_transitions,
   );
   return generalValue ?? 0;
 });
