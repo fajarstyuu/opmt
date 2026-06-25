@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-64 h-full bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg p-6 overflow-auto"
+    class="w-full lg:w-64 flex-1 min-h-0 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg p-4 lg:p-6 overflow-y-auto scrollbar-hidden"
   >
     <!-- Section Informasi -->
     <div>

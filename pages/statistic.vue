@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-scroll rounded-3xl space-y-8">
+  <div class="overflow-auto rounded-3xl space-y-8">
     <template v-if="statisticPending">
       <div
         class="bg-white rounded-2xl p-6 shadow-md h-80 space-y-6 animate-pulse"
@@ -19,7 +19,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="bg-white rounded-2xl p-6 shadow-md h-80 space-y-4">
+      <div class="bg-white rounded-2xl p-4 md:p-6 shadow-md h-80 space-y-4">
         <div class="flex items-center gap-3">
           <label class="text-sm text-gray-600">Metric:</label>
           <select
@@ -49,106 +49,108 @@
         </div>
         <StatisticChart :selectedStatisticData="selectedStatisticData" />
       </div>
-      <table class="min-w-full bg-white rounded-2xl overflow-hidden shadow">
-        <thead>
-          <tr>
-            <th v-for="value in selectedHeaders" class="px-4 py-2 border">
-              {{ value }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-if="normalizedSelectedStatistic === 'Overview'">
-            <template v-if="statisticTableData.length === 0">
-              <tr>
-                <td
-                  class="px-4 py-2 border text-center"
-                  :colspan="selectedHeaders.length"
-                >
-                  No data available.
-                </td>
-              </tr>
+      <div class="overflow-x-auto rounded-2xl shadow scrollbar-hidden">
+        <table class="min-w-full bg-white rounded-2xl overflow-hidden">
+          <thead>
+            <tr>
+              <th v-for="value in selectedHeaders" class="px-4 py-2 border">
+                {{ value }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-if="normalizedSelectedStatistic === 'Overview'">
+              <template v-if="statisticTableData.length === 0">
+                <tr>
+                  <td
+                    class="px-4 py-2 border text-center"
+                    :colspan="selectedHeaders.length"
+                  >
+                    No data available.
+                  </td>
+                </tr>
+              </template>
+              <template v-else>
+                <tr v-for="(row, index) in statisticTableData" :key="index">
+                  <td class="px-4 py-2 border">{{ row.activity }}</td>
+                  <td class="px-4 py-2 border">{{ row.count }}</td>
+                  <td class="px-4 py-2 border">{{ row.percent }}</td>
+                  <td class="px-4 py-2 border">
+                    {{ formatDuration(row.median) }}
+                  </td>
+                  <td class="px-4 py-2 border">
+                    {{ formatDuration(row.mean) }}
+                  </td>
+                  <td class="px-4 py-2 border">
+                    {{ formatDuration(row.range) }}
+                  </td>
+                </tr>
+              </template>
             </template>
-            <template v-else>
-              <tr v-for="(row, index) in statisticTableData" :key="index">
-                <td class="px-4 py-2 border">{{ row.activity }}</td>
-                <td class="px-4 py-2 border">{{ row.count }}</td>
-                <td class="px-4 py-2 border">{{ row.percent }}</td>
-                <td class="px-4 py-2 border">
-                  {{ formatDuration(row.median) }}
-                </td>
-                <td class="px-4 py-2 border">
-                  {{ formatDuration(row.mean) }}
-                </td>
-                <td class="px-4 py-2 border">
-                  {{ formatDuration(row.range) }}
-                </td>
-              </tr>
+            <template v-else-if="normalizedSelectedStatistic === 'Cases'">
+              <template v-if="statisticTableData.length === 0">
+                <tr>
+                  <td
+                    class="px-4 py-2 border text-center"
+                    :colspan="selectedHeaders.length"
+                  >
+                    No data available.
+                  </td>
+                </tr>
+              </template>
+              <template v-else>
+                <tr v-for="(row, index) in statisticTableData" :key="index">
+                  <td class="px-4 py-2 border">{{ row.case_id }}</td>
+                  <td class="px-4 py-2 border">{{ row.event_count }}</td>
+                  <td class="px-4 py-2 border">{{ row.start_time }}</td>
+                  <td class="px-4 py-2 border">{{ row.end_time }}</td>
+                  <td class="px-4 py-2 border">
+                    {{ formatDuration(row.duration) }}
+                  </td>
+                </tr>
+              </template>
             </template>
-          </template>
-          <template v-else-if="normalizedSelectedStatistic === 'Cases'">
-            <template v-if="statisticTableData.length === 0">
-              <tr>
-                <td
-                  class="px-4 py-2 border text-center"
-                  :colspan="selectedHeaders.length"
-                >
-                  No data available.
-                </td>
-              </tr>
+            <template v-else-if="normalizedSelectedStatistic === 'Resources'">
+              <template v-if="statisticTableData.length === 0">
+                <tr>
+                  <td
+                    class="px-4 py-2 border text-center"
+                    :colspan="selectedHeaders.length"
+                  >
+                    No data available.
+                  </td>
+                </tr>
+              </template>
+              <template v-else>
+                <tr v-for="(row, index) in statisticTableData" :key="index">
+                  <td class="px-4 py-2 border">{{ row.resource }}</td>
+                  <td class="px-4 py-2 border">{{ row.count }}</td>
+                  <td class="px-4 py-2 border">{{ row.percent }}</td>
+                </tr>
+              </template>
             </template>
-            <template v-else>
-              <tr v-for="(row, index) in statisticTableData" :key="index">
-                <td class="px-4 py-2 border">{{ row.case_id }}</td>
-                <td class="px-4 py-2 border">{{ row.event_count }}</td>
-                <td class="px-4 py-2 border">{{ row.start_time }}</td>
-                <td class="px-4 py-2 border">{{ row.end_time }}</td>
-                <td class="px-4 py-2 border">
-                  {{ formatDuration(row.duration) }}
-                </td>
-              </tr>
+            <template v-else-if="normalizedSelectedStatistic === 'Variants'">
+              <template v-if="statisticTableData.length === 0">
+                <tr>
+                  <td
+                    class="px-4 py-2 border text-center"
+                    :colspan="selectedHeaders.length"
+                  >
+                    No data available.
+                  </td>
+                </tr>
+              </template>
+              <template v-else>
+                <tr v-for="(row, index) in statisticTableData" :key="index">
+                  <td class="px-4 py-2 border">{{ row.variant }}</td>
+                  <td class="px-4 py-2 border">{{ row.count }}</td>
+                  <td class="px-4 py-2 border">{{ row.percent }}</td>
+                </tr>
+              </template>
             </template>
-          </template>
-          <template v-else-if="normalizedSelectedStatistic === 'Resources'">
-            <template v-if="statisticTableData.length === 0">
-              <tr>
-                <td
-                  class="px-4 py-2 border text-center"
-                  :colspan="selectedHeaders.length"
-                >
-                  No data available.
-                </td>
-              </tr>
-            </template>
-            <template v-else>
-              <tr v-for="(row, index) in statisticTableData" :key="index">
-                <td class="px-4 py-2 border">{{ row.resource }}</td>
-                <td class="px-4 py-2 border">{{ row.count }}</td>
-                <td class="px-4 py-2 border">{{ row.percent }}</td>
-              </tr>
-            </template>
-          </template>
-          <template v-else-if="normalizedSelectedStatistic === 'Variants'">
-            <template v-if="statisticTableData.length === 0">
-              <tr>
-                <td
-                  class="px-4 py-2 border text-center"
-                  :colspan="selectedHeaders.length"
-                >
-                  No data available.
-                </td>
-              </tr>
-            </template>
-            <template v-else>
-              <tr v-for="(row, index) in statisticTableData" :key="index">
-                <td class="px-4 py-2 border">{{ row.variant }}</td>
-                <td class="px-4 py-2 border">{{ row.count }}</td>
-                <td class="px-4 py-2 border">{{ row.percent }}</td>
-              </tr>
-            </template>
-          </template>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </template>
   </div>
 </template>
@@ -176,7 +178,7 @@ watch(
       fetchStatistic();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -186,11 +188,11 @@ watch(
       await fetchStatistic({ force: true });
       resetFilterStatus();
     }
-  }
+  },
 );
 
 const normalizedSelectedStatistic = computed(() =>
-  (selectedStatistic.value || "").trim()
+  (selectedStatistic.value || "").trim(),
 );
 
 const selectedStatisticData = ref("count");
@@ -210,7 +212,7 @@ watch(
       selectedStatisticData.value = allowed[0];
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const overviewHeaders = [

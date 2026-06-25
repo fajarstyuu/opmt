@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-64 h-full bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg px-6 py-4 shadow-lg overflow-scroll scrollbar-hidden"
+    class="w-full lg:w-64 h-full bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg px-4 lg:px-6 py-4 shadow-lg overflow-auto scrollbar-hidden"
   >
     <!-- Selected file info (shared state) -->
     <div>

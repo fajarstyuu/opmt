@@ -2,9 +2,9 @@
   <!-- <template v-if="query">
 
     </template> -->
-  <div class="flex justify-end mb-4">
+  <div class="flex justify-end mb-3 md:mb-4">
     <button
-      class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors"
+      class="w-full sm:w-auto px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors"
       :class="[
         isApplyingFilters
           ? 'bg-gray-400 cursor-not-allowed'

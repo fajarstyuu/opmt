@@ -1,136 +1,148 @@
 <template>
-  <div class="flex items-center justify-between mb-6">
-    <div class="flex gap-2">
-      <button
-        @click="zoomIn"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+  <div class="flex flex-col h-full overflow-y-auto scrollbar-hidden">
+    <!-- Toolbar -->
+    <div
+      class="flex flex-col gap-4 mb-4 lg:flex-row lg:items-center lg:justify-between lg:mb-6 flex-shrink-0"
+    >
+      <div
+        class="flex gap-2 overflow-x-auto scrollbar-hidden snap-x snap-mandatory pb-1"
       >
-        Zoom In
-      </button>
-      <button
-        @click="zoomOut"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
-      >
-        Zoom Out
-      </button>
-      <button
-        @click="resetZoom"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
-      >
-        Reset
-      </button>
-      <button
-        @click="handleDownload"
-        :disabled="isDownloading"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isDownloading ? "Downloading..." : "Download" }}
-      </button>
-      <button
-        @click="handleDownloadEventLog"
-        :disabled="isDownloadingEventLog"
-        class="px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isDownloadingEventLog ? "Downloading..." : "Download Event Log" }}
-      </button>
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-600">Model:</span>
-        <select
-          v-model="selectedModelType"
-          class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        <button
+          @click="zoomIn"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
         >
-          <option value="petrinet">Petrinet</option>
-          <option value="dfg">DFG</option>
-        </select>
-      </div>
-      <template v-if="selectedModelType === 'dfg'">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">Type:</span>
+          Zoom In
+        </button>
+        <button
+          @click="zoomOut"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+        >
+          Zoom Out
+        </button>
+        <button
+          @click="resetZoom"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+        >
+          Reset
+        </button>
+        <button
+          @click="handleDownload"
+          :disabled="isDownloading"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ isDownloading ? "Downloading..." : "Download" }}
+        </button>
+        <button
+          @click="handleDownloadEventLog"
+          :disabled="isDownloadingEventLog"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ isDownloadingEventLog ? "Downloading..." : "Download Event Log" }}
+        </button>
+        <div class="flex-shrink-0 snap-start flex items-center gap-2">
+          <span class="text-sm text-gray-600 whitespace-nowrap">Model:</span>
           <select
-            v-model="selectedModelTypeDisplay"
+            v-model="selectedModelType"
             class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="dur">Duration</option>
-            <option value="freq">Frequency</option>
+            <option value="petrinet">Petrinet</option>
+            <option value="dfg">DFG</option>
           </select>
         </div>
-      </template>
-    </div>
-    <div class="flex flex-wrap items-center gap-4">
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-600">Algorithm:</span>
-        <select
-          v-model="selectedAlgorithmValue"
-          class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option
-            v-for="option in algorithmOptions"
-            :key="option.value"
-            :value="option.value"
+        <template v-if="selectedModelType === 'dfg'">
+          <div class="flex-shrink-0 snap-start flex items-center gap-2">
+            <span class="text-sm text-gray-600 whitespace-nowrap">Type:</span>
+            <select
+              v-model="selectedModelTypeDisplay"
+              class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="dur">Duration</option>
+              <option value="freq">Frequency</option>
+            </select>
+          </div>
+        </template>
+      </div>
+      <div
+        class="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hidden snap-x snap-mandatory pb-1"
+      >
+        <div class="flex-shrink-0 snap-start flex items-center gap-2">
+          <span class="text-sm text-gray-600 whitespace-nowrap"
+            >Algorithm:</span
           >
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="bg-white px-4 py-2 rounded-xl border-2 flex flex-col gap-1 min-w-[220px] text-xs"
-      >
-        <div class="flex items-center justify-between text-xs text-gray-600">
-          <span>Noise Threshold</span>
-          <span class="font-semibold text-gray-900">
-            {{ formattedNoiseThreshold }}
-          </span>
+          <select
+            v-model="selectedAlgorithmValue"
+            class="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option
+              v-for="option in algorithmOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
         </div>
-        <input
-          type="range"
-          class="w-full accent-indigo-600"
-          min="0"
-          max="1"
-          step="0.01"
-          v-model.number="noiseThresholdValue"
-        />
+        <div
+          class="flex-shrink-0 snap-start bg-white px-4 py-2 rounded-xl border-2 flex flex-col gap-1 min-w-[180px] lg:min-w-[220px] text-xs"
+        >
+          <div class="flex items-center justify-between text-xs text-gray-600">
+            <span>Noise Threshold</span>
+            <span class="font-semibold text-gray-900">
+              {{ formattedNoiseThreshold }}
+            </span>
+          </div>
+          <input
+            type="range"
+            class="w-full accent-indigo-600"
+            min="0"
+            max="1"
+            step="0.01"
+            v-model.number="noiseThresholdValue"
+          />
+        </div>
+        <button
+          @click="handleDiscover"
+          :disabled="isDiscovering"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-red-100 text-red-700 rounded-lg border-red-200 border-2 hover:bg-red-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ isDiscovering ? "Discovering..." : "Discover!" }}
+        </button>
+        <button
+          @click="handleEvaluate"
+          :disabled="isEvaluating"
+          class="flex-shrink-0 snap-start px-3 py-1.5 text-xs font-medium bg-green-100 text-green-700 rounded-lg border-green-200 border-2 hover:bg-green-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ isEvaluating ? "Evaluating..." : "Evaluate" }}
+        </button>
       </div>
-      <button
-        @click="handleDiscover"
-        :disabled="isDiscovering"
-        class="px-3 py-1.5 text-xs font-medium bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isDiscovering ? "Discovering..." : "Discover!" }}
-      </button>
-      <button
-        @click="handleEvaluate"
-        :disabled="isEvaluating"
-        class="px-3 py-1.5 text-xs font-medium bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {{ isEvaluating ? "Evaluating..." : "Evaluate" }}
-      </button>
     </div>
-  </div>
 
-  <!-- Petrinet -->
-  <div class="flex flex-row h-full space-x-4">
-    <div
-      ref="cyContainer"
-      class="w-full flex-1 min-h-[300px] overflow-auto"
-    ></div>
-  </div>
-  <!-- Conformance Metrics -->
-  <div class="mt-6">
-    <h2 class="text-base font-semibold text-gray-800 mb-3">
-      Evaluation Metrics
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+    <!-- Petrinet -->
+    <div class="flex flex-row flex-1 space-x-4 min-h-[300px] lg:min-h-0">
       <div
-        v-for="metric in conformanceMetrics"
-        :key="metric.label"
-        class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
-      >
-        <p class="text-gray-500 text-xs uppercase tracking-wide">
-          {{ metric.label }}
-        </p>
-        <p class="text-lg font-semibold text-gray-900">
-          {{ metric.value }}
-        </p>
+        ref="cyContainer"
+        class="w-full flex-1 min-h-[300px] overflow-auto"
+      ></div>
+    </div>
+    <div
+      class="mt-4 lg:mt-6 flex-shrink-0 bg-white/70 backdrop-blur-sm rounded-2xl p-4 lg:p-0 lg:bg-transparent lg:backdrop-blur-none lg:rounded-none shadow-md lg:shadow-none"
+    >
+      <h2 class="text-base font-semibold text-gray-800 mb-3">
+        Evaluation Metrics
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+        <div
+          v-for="metric in conformanceMetrics"
+          :key="metric.label"
+          class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+        >
+          <p class="text-gray-500 text-xs uppercase tracking-wide">
+            {{ metric.label }}
+          </p>
+          <p class="text-lg font-semibold text-gray-900">
+            {{ metric.value }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -139,12 +151,9 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import cytoscape from "cytoscape";
-
-import { useFilters } from "~/composables/useFilters";
 import { useFilterSelection } from "~/composables/useModel";
 
 const { data, downloadModel } = useFile();
-const { selectedAlgorithm, noiseThreshold } = useFilters();
 const { selection: filterSelection } = useFilterSelection();
 
 const algorithmOptions = [
@@ -153,8 +162,8 @@ const algorithmOptions = [
   { label: "Alpha Miner", value: "alpha" },
 ];
 
-const selectedAlgorithmValue = selectedAlgorithm;
-const noiseThresholdValue = noiseThreshold;
+const selectedAlgorithmValue = ref("inductive");
+const noiseThresholdValue = ref(0);
 watch(selectedAlgorithmValue, (newVal) => {
   console.log("Selected Algorithm changed to:", newVal);
 });
@@ -544,7 +553,7 @@ function rebuildGraph() {
     "Cytoscape created. nodes:",
     inst.nodes().length,
     "edges:",
-    inst.edges().length
+    inst.edges().length,
   );
 
   if (type === "dfg") {
@@ -569,7 +578,7 @@ function rebuildGraph() {
   if (inst.nodes().length === 0) {
     console.warn(
       "Cytoscape has zero nodes after creation. Sample elements:",
-      elements.slice(0, 10)
+      elements.slice(0, 10),
     );
   } else {
     try {
@@ -585,7 +594,7 @@ watch(
   () => {
     rebuildGraph();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(() => {
@@ -601,7 +610,7 @@ async function handleDownload() {
       algorithm: selectedAlgorithmValue.value || "inductive",
       noiseThreshold: clampNoise(noiseThresholdValue.value),
       variantsCoverage: fallbackPercentage(
-        filterSelection.value.variantsCoverage
+        filterSelection.value.variantsCoverage,
       ),
       eventCoverage: fallbackPercentage(filterSelection.value.eventCoverage),
       caseDurationMin: sanitizeNumber(filterSelection.value.caseDurationMin),
@@ -678,7 +687,7 @@ const handleDiscover = async () => {
     const response = await discoverModel(
       activeSessionId,
       algorithm,
-      noiseThreshold
+      noiseThreshold,
     );
     console.log("Discovery complete.", response);
 
@@ -716,11 +725,11 @@ const handleEvaluate = async () => {
   const noiseThreshold = clampNoise(thresholdRaw);
   const variantsCoverageRatio = percentageToRatio(
     filterSelection.value.variantsCoverage,
-    1
+    1,
   );
   const eventsCoverageRatio = percentageToRatio(
     filterSelection.value.eventCoverage,
-    1
+    1,
   );
 
   isEvaluating.value = true;
@@ -745,10 +754,10 @@ const handleEvaluate = async () => {
         variants_coverage: variantsCoverageRatio,
         events_coverage: eventsCoverageRatio,
         min_case_duration: sanitizeNumber(
-          filterSelection.value.caseDurationMin
+          filterSelection.value.caseDurationMin,
         ),
         max_case_duration: sanitizeNumber(
-          filterSelection.value.caseDurationMax
+          filterSelection.value.caseDurationMax,
         ),
         min_case_size: sanitizeNumber(filterSelection.value.minCaseSize),
         max_case_size: sanitizeNumber(filterSelection.value.maxCaseSize),

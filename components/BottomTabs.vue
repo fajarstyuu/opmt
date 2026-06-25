@@ -1,10 +1,12 @@
 <template>
-  <div class="flex gap-4">
+  <div
+    class="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hidden snap-x snap-mandatory"
+  >
     <NuxtLink
       to="/statistic"
       @click="select('statistics')"
       :class="[
-        'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
+        'flex-shrink-0 flex-1 min-w-[120px] py-3 md:py-4 rounded-xl font-semibold text-sm md:text-lg transition-all duration-200 shadow-md snap-start',
         selected === 'statistics'
           ? 'bg-blue-400 text-white'
           : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-white',
@@ -35,7 +37,7 @@
       to="/discovery"
       @click="select('discovery')"
       :class="[
-        'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
+        'flex-shrink-0 flex-1 min-w-[120px] py-3 md:py-4 rounded-xl font-semibold text-sm md:text-lg transition-all duration-200 shadow-md snap-start',
         selected === 'discovery'
           ? 'bg-blue-400 text-white'
           : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-white',
@@ -65,7 +67,7 @@
       to="/filter?t=variants%coverage"
       @click="select('filter')"
       :class="[
-        'flex-1 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-md',
+        'flex-shrink-0 flex-1 min-w-[120px] py-3 md:py-4 rounded-xl font-semibold text-sm md:text-lg transition-all duration-200 shadow-md snap-start',
         selected === 'filter'
           ? 'bg-blue-400 text-white'
           : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-white',
